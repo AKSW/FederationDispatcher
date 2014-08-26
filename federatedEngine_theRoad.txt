@@ -1,0 +1,24 @@
+Ziel: 
+- Zugriff auf verschiedene Sparql-Endpoints im Bibliothekskontext über einfache Schnittstelle.
+- Suche nach tool zum automatischen Auflösen des Kontextes von federatedSparql
+
+Test1:
+- Auswahl von FedX als vielversprechendes tool mit einfacher Anwendung (config file und query file)
+	- basierend auf Ask-Queries zur Quellenauswahl
+	- Problem: DBpedia Politik erlaubt keine Ask-Queries an den Endpunkt mehr
+https://groups.google.com/forum/#!topic/iwb-discussion/Fb6SwQRWdv4
+	- Ergebnis: FedX wäre nur für lokale Endpunkte brauchbar, schlechter Effektiveinsatz
+Test2: 
+- DARQ - Federated Queries with SPARQL http://darq.sourceforge.net
+- Installation über svn - Funktionalität über query- und configfile
+	- scheint zu funktionieren, allerdings Fehlermeldung wegen fehlendem Mapping
+- Keine Erfahrungswerte, statt dessen Verweis auf Stand der Entwicklung: seit 2006 kein update
+http://blog.quilitz.de/2010/01/darq-federated-sparql-queries-status/
+- debug möglich
+
+Test3:
+- splendid
+https://code.google.com/p/rdffederator/
+
+
+
