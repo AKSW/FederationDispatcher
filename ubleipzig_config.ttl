@@ -3,5 +3,5 @@
 <http://lobit> fluid:store "SPARQLEndpoint";
 fluid:SPARQLEndpoint "http://lobid.org/sparql/".
 
-<http://europeana> fluid:store "SPARQLEndpoint";
-fluid:SPARQLEndpoint "http://europeana.ontotext.com/sparql/".
+#<http://europeana> fluid:store "SPARQLEndpoint";
+#fluid:SPARQLEndpoint "http://europeana.ontotext.com/sparql/".
