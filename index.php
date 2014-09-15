@@ -1,5 +1,5 @@
 <?php
-//Post oder Get not set print formular
+//Post oder Get not set: print formular
 if(!($_POST or $_GET)){
 ?>
 <!DOCTYPE HTML>
@@ -31,16 +31,20 @@ select distinct ?Concept where {[] a ?Concept} LIMIT 100
 <?php
 }else{
     //processing the query
-    //writing queryfile for FedX
+    //writing temp. queryfile for FedX
     $query = ($_POST)? $_POST['query'] : $_GET['query'];
-    $queryfile = fopen("query.txt","w");
-    fwrite($queryfile,$query);
-    fclose($queryfile);
+    $tmpfilename = tempnam('/tmp','query-');
+    $queryfile = fopen($tmpfilename,'w') or die ($php_errormsg);
+    fputs($queryfile,$query);
     //Aufruf von FedX
-    $FedX_response = shell_exec("cd ./FedX && ./cli.sh -d ./../ubleipzig_config.ttl @q ./../query.txt");
-    echo "<p>Antwort des Federation Dispatchers:</p></br>";
-    print($FedX_response);
-    
+    $FedX_response = shell_exec("cd ./FedX && ./cli.sh -d ./../ubleipzig_config.ttl -f XML -folder ".$tmpfilename." @q ./..".$tmpfilename);
+    fclose($queryfile);
+    $response = simplexml_load_file('/FedX/response/'.$tmpfilename.'/q_1.xml');
+    //we can now easily do fancy transformation stuff
+    //e.g. print it
+    echo $response->asXML();
+    //remove the temporary FedX response file
+    shell_exec("cd ./FedX && rm -r ".$tmpfilename);
     if(stristr($_SERVER['HTTP_ACCEPT'], "application/xhtml+xml")){
         //header("Content-Type: application/xhtml+xml; charset=utf-8");
         //Format: xhtml+xml Seite
