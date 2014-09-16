@@ -36,27 +36,27 @@ select distinct ?Concept where {[] a ?Concept} LIMIT 100
     $tmpfilename = tempnam('/tmp','query-');
     $queryfile = fopen($tmpfilename,'w') or die ($php_errormsg);
     fputs($queryfile,$query);
+    //content negotiation
+    $accept = explode(",",$_SERVER['HTTP_ACCEPT']);
+    foreach ($accept as $x){
+        if($x == "application/xhtml+xml spaql"){
+            $format = "XML";
+            break;
+        }elseif($x == "application/xhtml+json"){
+            $format = "JSON";
+            break;
+        }elseif
+    }
+        
     //Aufruf von FedX
-    $FedX_response = shell_exec("cd ./FedX && ./cli.sh -d ./../ubleipzig_config.ttl -f XML -folder ".$tmpfilename." @q ./..".$tmpfilename);
+    $FedX_response = shell_exec("cd ./FedX && ./cli.sh -d ./../ubleipzig_config.ttl -f ".$format." -folder ".$tmpfilename." @q ./..".$tmpfilename);
     fclose($queryfile);
-    $response = simplexml_load_file('/FedX/response/'.$tmpfilename.'/q_1.xml');
-    //we can now easily do fancy transformation stuff
-    //e.g. print it
-    echo $response->asXML();
+    //read whole response file into single string no matter what format is used
+    $response = file_get_contents('/FedX/response/'.$tmpfilename.'/q_1.xml');
+    echo $response;
     //remove the temporary FedX response file
     shell_exec("cd ./FedX && rm -r ".$tmpfilename);
-    if(stristr($_SERVER['HTTP_ACCEPT'], "application/xhtml+xml")){
-        //header("Content-Type: application/xhtml+xml; charset=utf-8");
-        //Format: xhtml+xml Seite
-    }elseif(stristr($_SERVER['HTTP_ACCEPT'], "application/rdf+xml")){
-        //header("Content-Type: text/html; charset=utf-8");
-        //Format: RDF/XML
-    }elseif(stristr($_SERVER['HTTP_ACCEPT'], "text/turtle")){
-        //Format: Turtle
-        
-    }else{
-        //user prob. has internet explorer?
-    }
+
 }
 
 ?>
