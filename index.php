@@ -30,33 +30,47 @@ select distinct ?Concept where {[] a ?Concept} LIMIT 100
 
 <?php
 }else{
-    //processing the query
-    //writing temp. queryfile for FedX
-    $query = ($_POST)? $_POST['query'] : $_GET['query'];
-    $tmpfilename = tempnam('/tmp','query-');
-    $queryfile = fopen($tmpfilename,'w') or die ($php_errormsg);
-    fputs($queryfile,$query);
     //content negotiation
     $accept = explode(",",$_SERVER['HTTP_ACCEPT']);
+    //initiate format as XML
+    $format = "XML";
     foreach ($accept as $x){
-        if($x == "application/xhtml+xml spaql"){
-            $format = "XML";
+        if(stristr($x,'application/sparql-results+xml')){
+            header('Content-Type: application/sparql-results+xml');
+            $header = "SPARQL-XML";
             break;
-        }elseif($x == "application/xhtml+json"){
+        }elseif(stristr($x,'application/sparql-results+json')){
+            header('Content-Type:applicaton/sparql-results+json');
+            $header = "SPARQL-JSON";
             $format = "JSON";
             break;
-        }elseif
+        }
     }
-        
+    if(!isset($header)){
+    //content must be html
+        echo "<!DOCTYPE HTML><html><head></head><body><p>Ihre Ergebnisse</p>";
+    }
+
+    //processing the query
+    //writing temp. queryfile for FedX
+    $query = ($_POST['query'])? $_POST['query'] : $_GET['query'];
+    $tmpfilename = tempnam('/tmp','query-');
+    $queryfile = fopen($tmpfilename,'w') or die;
+    fputs($queryfile,$query);
+    $tmpfilename=substr($tmpfilename,5);
+
     //Aufruf von FedX
-    $FedX_response = shell_exec("cd ./FedX && ./cli.sh -d ./../ubleipzig_config.ttl -f ".$format." -folder ".$tmpfilename." @q ./..".$tmpfilename);
+    $FedX_response = shell_exec("cd ./FedX/results && mkdir ".$tmpfilename." && cd .. && ./cli.sh -d ./../ubleipzig_config.ttl -f ".$format." -folder ".$tmpfilename." -q \"".file_get_contents("/tmp/".$tmpfilename)."\"");
+    echo $FedX_response;
     fclose($queryfile);
     //read whole response file into single string no matter what format is used
-    $response = file_get_contents('/FedX/response/'.$tmpfilename.'/q_1.xml');
+    $response = file_get_contents('/FedX/results/'.$tmpfilename.'/q_1.xml');
     echo $response;
     //remove the temporary FedX response file
-    shell_exec("cd ./FedX && rm -r ".$tmpfilename);
-
+    shell_exec("cd ./FedX/results && rm -r ".$tmpfilename."/");
+    if(!isset($header)){
+        echo "</body></html>";
+    }
 }
 
 ?>
