@@ -58,13 +58,12 @@ select distinct ?Concept where {[] a ?Concept} LIMIT 100
     $queryfile = fopen($tmpfilename,'w') or die;
     fputs($queryfile,$query);
     $tmpfilename=substr($tmpfilename,5);
+    //call FedX
+    $FedX_response = shell_exec("cd ./FedX/results && mkdir ".$tmpfilename." && cd .. && ./cli.sh -d ./../ubleipzig_config.ttl -f ".$format." -folder ".$tmpfilename." @q /../tmp/".$tmpfilename);
 
-    //Aufruf von FedX
-    $FedX_response = shell_exec("cd ./FedX/results && mkdir ".$tmpfilename." && cd .. && ./cli.sh -d ./../ubleipzig_config.ttl -f ".$format." -folder ".$tmpfilename." -q \"".file_get_contents("/tmp/".$tmpfilename)."\"");
-    echo $FedX_response;
     fclose($queryfile);
     //read whole response file into single string no matter what format is used
-    $response = file_get_contents('/FedX/results/'.$tmpfilename.'/q_1.xml');
+    $response = file_get_contents('./FedX/results/'.$tmpfilename.'/q_1.'.strtolower($format));
     echo $response;
     //remove the temporary FedX response file
     shell_exec("cd ./FedX/results && rm -r ".$tmpfilename."/");
