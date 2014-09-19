@@ -60,11 +60,14 @@ select distinct ?Concept where {[] a ?Concept} LIMIT 100
     $tmpfilename=substr($tmpfilename,5);
     //call FedX
     $FedX_response = shell_exec("cd ./FedX/results && mkdir ".$tmpfilename." && cd .. && ./cli.sh -d ./../ubleipzig_config.ttl -f ".$format." -folder ".$tmpfilename." @q /../tmp/".$tmpfilename);
-
     fclose($queryfile);
     //read whole response file into single string no matter what format is used
-    $response = file_get_contents('./FedX/results/'.$tmpfilename.'/q_1.'.strtolower($format));
-    echo $response;
+    if(file_exists('./FedX/results/'.$tmpfilename.'/q_1.'.strtolower($format))){
+        $response = file_get_contents('./FedX/results/'.$tmpfilename.'/q_1.'.strtolower($format));
+        echo $response;
+    }else{
+        echo "Antwortfile konnte nicht gefunden werden. Fehlermeldung der Federation Engine:<br>".$FedX_response;
+    }
     //remove the temporary FedX response file
     shell_exec("cd ./FedX/results && rm -r ".$tmpfilename."/");
     if(!isset($header)){
