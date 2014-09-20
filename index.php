@@ -1,6 +1,16 @@
 <?php
+// Default values
+$fedxBase = 'FedX/';
+$resultsDir = 'results/';
+$tmpDir = uniqid() . '/';
+$fedxConfFile = 'ubleipzig_config.ttl';
+/**
+ * Set keep to true, if you want to keep the query and result files after execution
+ */
+$keep = false;
+
 //Post oder Get not set: print formular
-if(!($_POST or $_GET)){
+if(!isset($_POST['query']) and !isset($_GET['query'])){
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -29,47 +39,63 @@ select distinct ?Concept where {[] a ?Concept} LIMIT 100
 </html>
 
 <?php
-}else{
+}else {
     //content negotiation
-    $accept = explode(",",$_SERVER['HTTP_ACCEPT']);
+    $accept = explode(",", $_SERVER['HTTP_ACCEPT']);
     //initiate format as XML
     $format = "XML";
-    foreach ($accept as $x){
-        if(stristr($x,'application/sparql-results+xml')){
+    foreach ($accept as $x) {
+        if (stristr($x, 'application/sparql-results+xml')) {
             header('Content-Type: application/sparql-results+xml');
             $header = "SPARQL-XML";
             break;
-        }elseif(stristr($x,'application/sparql-results+json')){
+        } elseif (stristr($x, 'application/sparql-results+json')) {
             header('Content-Type:applicaton/sparql-results+json');
             $header = "SPARQL-JSON";
             $format = "JSON";
             break;
         }
     }
-    if(!isset($header)){
-    //content must be html
+    if (!isset($header)) {
+        //content must be html
         echo "<!DOCTYPE HTML><html><head></head><body><p>Ihre Ergebnisse</p>";
     }
 
     //processing the query
     //writing temp. queryfile for FedX
-    $query = ($_POST['query'])? $_POST['query'] : $_GET['query'];
-    $tmpfilename = tempnam('/tmp','query-');
-    $queryfile = fopen($tmpfilename,'w') or die;
-    fputs($queryfile,$query);
-    $tmpfilename=substr($tmpfilename,5);
+    $query = ($_POST['query']) ? $_POST['query'] : $_GET['query'];
+
+    if (!mkdir($fedxBase . $resultsDir . $tmpDir)) {
+        throw new Exception("Can't create temporary directory");
+    }
+
+    // Create query file
+    $queryFile = fopen($fedxBase . $resultsDir . $tmpDir . "query", 'w') or die("Can't open file for writing query.");
+    fputs($queryFile, $query);
+    fclose($queryFile);
+
     //call FedX
-    $FedX_response = shell_exec("cd ./FedX/results && mkdir ".$tmpfilename." && cd .. && ./cli.sh -d ./../ubleipzig_config.ttl -f ".$format." -folder ".$tmpfilename." @q /../tmp/".$tmpfilename);
-    fclose($queryfile);
+    $command = "cd $fedxBase && sh ./cli.sh -d ../$fedxConfFile -f $format -folder $tmpDir @q ${resultsDir}${tmpDir}query";
+
+    $fedxOutput = array();
+    $fedxResponse = exec($command, $fedxOutput);
+    if ($fedxResponse != 0) {
+        echo "Execution of FedX was not successfull, returncode: $fedxResponse";
+        var_dump($fedxOutput);
+    }
+
     //read whole response file into single string no matter what format is used
-    if(file_exists('./FedX/results/'.$tmpfilename.'/q_1.'.strtolower($format))){
-        $response = file_get_contents('./FedX/results/'.$tmpfilename.'/q_1.'.strtolower($format));
-        echo $response;
-    }else{
-        echo "Antwortfile konnte nicht gefunden werden. Fehlermeldung der Federation Engine:<br>".$FedX_response;
+    $resultFile = $fedxBase . $resultsDir . $tmpDir . 'q_1.' . strtolower($format);
+    if (file_exists($resultFile)) {
+        $response = file_get_contents($resultFile);
+        echo "<pre>" . htmlentities($response) . "</pre>";
+    } else {
+        echo "Antwortfile konnte nicht gefunden werden. Fehlermeldung der Federation Engine:<br>" . $fedxOutput;
     }
     //remove the temporary FedX response file
-    shell_exec("cd ./FedX/results && rm -r ".$tmpfilename."/");
+    if (!$keep) {
+        exec("rm -r ${fedxBase}${resultsDir}${tmpName}");
+    }
     if(!isset($header)){
         echo "</body></html>";
     }
