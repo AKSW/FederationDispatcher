@@ -90,7 +90,8 @@ select distinct ?Concept where {[] a ?Concept} LIMIT 100
         $response = file_get_contents($resultFile);
         echo "<pre>" . htmlentities($response) . "</pre>";
     } else {
-        echo "Antwortfile konnte nicht gefunden werden. Fehlermeldung der Federation Engine:<br>" . $fedxOutput;
+        echo "Antwortfile konnte nicht gefunden werden. Fehlermeldung der Federation Engine:<br>";
+        var_dump($fedxOutput);
     }
     //remove the temporary FedX response file
     if (!$keep) {
