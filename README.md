@@ -6,9 +6,7 @@ This Project is about enabling federated sparql queries on systems of the UbLeip
 Dependencies
 ============
 
-[FedX](http://www.fluidops.com/fedx/)
-
-A FedX installation has to be placed in a subdirectory `FedX` of this project.
+A [FedX](http://www.fluidops.com/de/unternehmen/training/open_source.php) installation has to be placed in a subdirectory `FedX` of this project.
 
 Problems with FedX
 ============
