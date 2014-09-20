@@ -94,7 +94,7 @@ select distinct ?Concept where {[] a ?Concept} LIMIT 100
     }
     //remove the temporary FedX response file
     if (!$keep) {
-        exec("rm -r ${fedxBase}${resultsDir}${tmpName}");
+        exec("rm -r ${fedxBase}${resultsDir}${tmpDir}");
     }
     if(!isset($header)){
         echo "</body></html>";
