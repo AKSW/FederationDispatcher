@@ -1,13 +1,14 @@
 FederationDispatcher
 ====================
 
-
 This Project is about enabling federated sparql queries on systems of the UbLeipzig to be used on some of the internal sparql-Endpoints. Therefore a simplified Interface to automatically resolve the context of the federated sparql query is needed.
 
-dependencies
+Dependencies
 ============
 
-`FedX`.http://www.fluidops.com/fedx/
+[FedX](http://www.fluidops.com/fedx/)
+
+A FedX installation has to be placed in a subdirectory `FedX` of this project.
 
 Problems with FedX
 ============
@@ -16,10 +17,9 @@ Problems with FedX
  further discussion:
  https://groups.google.com/forum/#!topic/iwb-discussion/Fb6SwQRWdv4
 
-configuration
+Configuration
 ===========
 to use this program, you will need 
-- /FedX in the working directory of the php script
-- /tmp/ folder with writing permission for the php script
-- /FedX/results folder with writing permission
-- ubleipzig_config.ttl federation configuration file (see FedX manual and examples)
+- A FedX installation in a subdirectory called`FedX/`
+- A directory called `FedX/results/` with writing permission for the PHP runtime
+- A federation configuration file (see FedX manual and examples) called `ubleipzig_config.ttl`. An example file is provided as `ubleipzig_config.ttl.dist`.
