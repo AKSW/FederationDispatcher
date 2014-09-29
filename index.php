@@ -8,7 +8,7 @@ if(!isset($_POST['query']) and !isset($_GET['query'])){
     echo file_get_contents('formular.html');
 }else {
     //processing the query
-    $query = ($_POST['query']) ? $_POST['query'] : $_GET['query'];
+    $query = (isset($_POST['query'])) ? $_POST['query'] : $_GET['query'];
     //generate query File
     if(!generateQueryFile($fedxBase, $resultsDir, $tmpDir, $query)){
         die("cant generate Query File, stopping script");
@@ -44,19 +44,3 @@ if(!isset($_POST['query']) and !isset($_GET['query'])){
         exec("rm -r ${fedxBase}${resultsDir}${tmpDir}");
     }
 }
-
-?>
-
-
-
-
-
-
-
-
-
-
-
-
-
-

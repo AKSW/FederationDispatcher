@@ -62,4 +62,3 @@ function negotiate_content(){
     }
     return $content;
 }
-?>
